@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>大正方形重拼證明</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&family=Kalam:wght@400;700&display=swap">
+<style>
+/* Layout: a classroom chalkboard — the board (canvas) is the hero, the algebra is written beneath it line by line. Deliberately single dark theme. */
+:root{
+  --board:#1f2d27; --frame:#3a2a1e; --chalk:#eef1e8; --dim:#9fb0a6; --line:#33463d;
+  --c2:#f4d35e; --a2:#f49ac1; --b2:#7cc6f2; --tri:#c9d6cc; --btn:#2a3b33;
+  --f-display:"Huninn","Noto Sans TC",system-ui,sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-math:"Kalam","Comic Sans MS",cursive;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--board);color:var(--chalk);font-family:var(--f-body);font-size:15px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:13px;letter-spacing:.14em;color:var(--dim)}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,6vw,44px);line-height:1.2;margin:0;text-wrap:balance}
+h1 .m{font-family:var(--f-math);font-weight:700;white-space:nowrap}
+.lede{margin:0;color:var(--dim);max-width:62ch}
+.boardbox{border:10px solid var(--frame);border-radius:8px;background:var(--board);box-shadow:inset 0 0 40px rgba(0,0,0,.35)}
+canvas{display:block;width:100%;height:auto;aspect-ratio:4/3;max-width:100%}
+.steps{display:flex;gap:6px}
+.steps button{flex:1;height:6px;padding:0;border:0;border-radius:3px;background:var(--line);cursor:pointer}
+.steps button.done{background:var(--c2)}
+.info{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px 28px}
+@media (max-width:680px){.info{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.sno{font-size:12px;color:var(--dim);letter-spacing:.1em}
+.stitle{font-family:var(--f-display);font-size:24px;margin:0;line-height:1.3}
+.sbody{margin:0;min-height:5em}
+.algebra{font-family:var(--f-math);font-size:clamp(19px,4.2vw,24px);line-height:1.5;display:flex;flex-direction:column;gap:4px;min-height:6.5em}
+.algebra .ln{opacity:.25;transition:opacity .4s}
+.algebra .ln.on{opacity:1}
+.algebra s{text-decoration-color:var(--a2);text-decoration-thickness:2px;opacity:.6}
+.c2{color:var(--c2)} .a2{color:var(--a2)} .b2{color:var(--b2)} .t{color:var(--tri)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button.b{font:inherit;font-weight:500;border:1px solid var(--line);background:var(--btn);color:var(--chalk);padding:8px 16px;border-radius:999px;cursor:pointer}
+button.primary{background:var(--c2);border-color:var(--c2);color:var(--board);font-weight:700}
+button:focus-visible,input:focus-visible{outline:2px solid var(--c2);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.field{display:flex;flex-direction:column;gap:2px}
+.field label{display:flex;justify-content:space-between;font-size:13px;color:var(--dim)}
+.field label b{font-family:var(--f-math);font-size:16px;color:var(--chalk)}
+input[type=range]{width:100%;accent-color:var(--c2)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a href="index.html" class="backlink" style="align-self:flex-start;font-size:14px;color:inherit;opacity:.75;text-decoration:none;border:1px solid currentColor;border-radius:999px;padding:4px 14px">← 回到首頁</a>
+  <header>
+    <span class="eyebrow">畢氏定理 · 拼貼證明</span>
+    <h1>同一個大正方形，拼兩種樣子 <span class="m"><span class="c2">c²</span> = <span class="a2">a²</span> + <span class="b2">b²</span></span></h1>
+    <p class="lede">邊長 a + b 的大正方形裡放四個一樣的直角三角形。換個位置擺，三角形的總面積沒變，大正方形也沒變，所以剩下的空白面積也一定一樣。</p>
+  </header>
+
+  <div class="boardbox"><canvas id="cv" width="900" height="675" aria-label="大正方形重拼動畫"></canvas></div>
+
+  <div class="steps" id="dots"></div>
+
+  <div class="info">
+    <div class="col">
+      <div class="sno" id="sno"></div>
+      <h2 class="stitle" id="stitle"></h2>
+      <p class="sbody" id="sbody"></p>
+      <div class="row">
+        <button class="b" id="prev">上一步</button>
+        <button class="b primary" id="next">下一步</button>
+        <button class="b" id="auto">▶ 自動播放</button>
+      </div>
+    </div>
+    <div class="col">
+      <div class="algebra" id="alg">
+        <div class="ln" data-s="0">(a+b)² = <span class="c2">c²</span> + <span class="t">4 × ½ab</span> = <span class="c2">c²</span> + <span class="t">2ab</span></div>
+        <div class="ln" data-s="2">(a+b)² = <span class="a2">a²</span> + <span class="t">2ab</span> + <span class="b2">b²</span></div>
+        <div class="ln" data-s="3"><span class="c2">c²</span> + <s>2ab</s> = <span class="a2">a²</span> + <span class="b2">b²</span> + <s>2ab</s></div>
+        <div class="ln" data-s="3">∴ <span class="a2">a²</span> + <span class="b2">b²</span> = <span class="c2">c²</span></div>
+      </div>
+      <div class="field">
+        <label for="a">股 a <b id="av">3</b></label>
+        <input type="range" id="a" min="1" max="8" step="0.5" value="3">
+      </div>
+      <div class="field">
+        <label for="b">股 b <b id="bv">4</b></label>
+        <input type="range" id="b" min="1" max="8" step="0.5" value="4">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),$=id=>document.getElementById(id);
+const S={a:3,b:4,T:0,target:0,last:0,raf:0};
+const STEPS=[
+  ['大正方形內嵌小正方形','邊長 a + b 的大正方形，四個角各放一個直角三角形（兩股 a、b，斜邊 c）。中間圍出來的，正是以斜邊為邊的正方形 c²。'],
+  ['重新拼貼','三角形的大小、形狀都不變，只是平移。左下那個不動，另外三個搬過去，兩兩靠在一起。'],
+  ['變成乘法公式的圖','四個三角形兩兩拼成兩個 a × b 的長方形，空出來的是 a² 和 b² 兩個正方形。這就是 (a+b)² = a² + 2ab + b² 的圖。'],
+  ['直接看出結論','左右是同一個大正方形、同樣四個三角形。三角形佔掉的面積一樣，剩下的空白（黃色和粉藍色）面積也就一樣：c² = a² + b²。']
+];
+const clamp=x=>Math.max(0,Math.min(1,x));
+const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const css=getComputedStyle(document.documentElement),V=n=>css.getPropertyValue(n).trim();
+
+function geom(){
+  const a=S.a,b=S.b,N=a+b;
+  return{a,b,N,c:Math.hypot(a,b),
+    inner:[[a,0],[N,a],[b,N],[0,b]],
+    tris:[
+      {p:[[0,0],[a,0],[0,b]],d:[0,0],w:[0,0]},
+      {p:[[N,0],[N,a],[a,0]],d:[0,b],w:[.3,.75]},
+      {p:[[N,N],[b,N],[N,a]],d:[-b,-a],w:[0,.45]},
+      {p:[[0,N],[0,b],[b,N]],d:[a,0],w:[.55,1]}],
+    sqA:[[0,b],[a,b],[a,N],[0,N]],
+    sqB:[[a,0],[N,0],[N,b],[a,b]],
+    rect1:[[0,0],[a,0],[a,b],[0,b]],
+    rect2:[[a,b],[N,b],[N,N],[a,N]]};
+}
+
+function resize(){const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);draw()}
+
+function board(g,ox,oy,size,m,o){
+  const d=o.d,sc=size/g.N,X=p=>[ox+sc*p[0],oy+size-sc*p[1]];
+  const path=poly=>{ctx.beginPath();poly.map(X).forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath()};
+  const fs=Math.max(11*d,Math.min(30*d,size*0.075));
+  const txt=(s,p,col,k=1)=>{const q=X(p);ctx.font=`700 ${fs*k}px Kalam,cursive`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=col;ctx.fillText(s,q[0],q[1])};
+  const cen=p=>[p.reduce((s,q)=>s+q[0],0)/p.length,p.reduce((s,q)=>s+q[1],0)/p.length];
+  // empty regions
+  const ac=clamp(1-m*3),ab=clamp(m*3-2);
+  ctx.globalAlpha=ac*.9;ctx.fillStyle=V('--c2');path(g.inner);ctx.fill();
+  ctx.globalAlpha=ab*.9;ctx.fillStyle=V('--a2');path(g.sqA);ctx.fill();ctx.fillStyle=V('--b2');path(g.sqB);ctx.fill();
+  ctx.globalAlpha=1;
+  // triangles
+  g.tris.forEach(t=>{
+    const k=t.w[1]>t.w[0]?ease(clamp((m-t.w[0])/(t.w[1]-t.w[0]))):0;
+    const pp=t.p.map(q=>[q[0]+t.d[0]*k,q[1]+t.d[1]*k]);
+    ctx.globalAlpha=o.dimTri?0.35:1;ctx.fillStyle=V('--tri');path(pp);ctx.fill();
+    ctx.globalAlpha=o.dimTri?0.5:1;ctx.strokeStyle=V('--board');ctx.lineWidth=2.5*d;ctx.lineJoin='round';path(pp);ctx.stroke();ctx.globalAlpha=1;
+    // right-angle tick
+    const r=Math.min(g.a,g.b)*0.16,c0=pp[0],u=[pp[1][0]-c0[0],pp[1][1]-c0[1]],v=[pp[2][0]-c0[0],pp[2][1]-c0[1]];
+    const lu=Math.hypot(...u),lv=Math.hypot(...v),U=[u[0]/lu*r,u[1]/lu*r],W=[v[0]/lv*r,v[1]/lv*r];
+    const q1=X([c0[0]+U[0],c0[1]+U[1]]),q2=X([c0[0]+U[0]+W[0],c0[1]+U[1]+W[1]]),q3=X([c0[0]+W[0],c0[1]+W[1]]);
+    ctx.strokeStyle=V('--board');ctx.lineWidth=1.5*d;ctx.globalAlpha=o.dimTri?.4:.8;ctx.beginPath();ctx.moveTo(...q1);ctx.lineTo(...q2);ctx.lineTo(...q3);ctx.stroke();ctx.globalAlpha=1;
+  });
+  // rectangles ab outline
+  if(o.rect>0){ctx.globalAlpha=o.rect;ctx.setLineDash([7*d,5*d]);ctx.strokeStyle=V('--chalk');ctx.lineWidth=2*d;path(g.rect1);ctx.stroke();path(g.rect2);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1}
+  // big square frame
+  ctx.strokeStyle=V('--chalk');ctx.lineWidth=3*d;ctx.strokeRect(ox,oy,size,size);
+  // outer side labels (a | b)
+  const gap=fs*0.75,dim=V('--dim');
+  if(o.sides){
+    const lab=(s,p0,p1,off)=>{const q0=X(p0),q1=X(p1);ctx.font=`700 ${fs*.8}px Kalam,cursive`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=dim;ctx.fillText(s,(q0[0]+q1[0])/2+off[0],(q0[1]+q1[1])/2+off[1])};
+    if(m<0.5){lab('a',[0,0],[g.a,0],[0,gap]);lab('b',[g.a,0],[g.N,0],[0,gap]);lab('b',[0,0],[0,g.b],[-gap,0]);lab('a',[0,g.b],[0,g.N],[-gap,0])}
+    else{lab('a',[0,0],[g.a,0],[0,gap]);lab('b',[g.a,0],[g.N,0],[0,gap]);lab('b',[0,0],[0,g.b],[-gap,0]);lab('a',[0,g.b],[0,g.N],[-gap,0])}
+    // tick marks at the a|b split
+    ctx.strokeStyle=dim;ctx.lineWidth=2*d;[[g.a,0,0,1],[0,g.b,1,0]].forEach(([x,y,hx,hy])=>{const q=X([x,y]);ctx.beginPath();ctx.moveTo(q[0]-hx*gap*.4,q[1]+hy*gap*.4);ctx.lineTo(q[0],q[1]);ctx.stroke()});
+  }
+  // region labels
+  if(ac>0.5){ctx.globalAlpha=ac;txt('c²',cen(g.inner),V('--board'),1.3);
+    const e=[g.inner[0],g.inner[1]],mid=[(e[0][0]+e[1][0])/2,(e[0][1]+e[1][1])/2],cc=cen(g.inner);
+    txt('c',[mid[0]+(cc[0]-mid[0])*.18,mid[1]+(cc[1]-mid[1])*.18],V('--board'),.85);ctx.globalAlpha=1}
+  if(ab>0.5){ctx.globalAlpha=ab;txt('a²',cen(g.sqA),V('--board'),g.a<2?.8:1.2);txt('b²',cen(g.sqB),V('--board'),1.2);ctx.globalAlpha=1}
+  if(o.rect>0){ctx.globalAlpha=o.rect*(o.dimTri?.6:1);txt('ab',cen(g.rect1),V('--board'),.95);txt('ab',cen(g.rect2),V('--board'),.95);ctx.globalAlpha=1}
+  return fs;
+}
+
+function draw(){
+  const W=cv.width,H=cv.height,d=W/(cv.getBoundingClientRect().width||W);
+  const g=geom(),T=S.T;ctx.clearRect(0,0,W,H);
+  const m=clamp(T),rect=ease(clamp(T-1)),sp=ease(clamp(T-2));
+  const big=Math.min(W*0.8,H*0.82),small=Math.min(W*0.38,H*0.62);
+  const size=big+(small-big)*sp;
+  const cxR=W/2+(W*0.25-0)*sp, cy=H/2-(H*0.05)*sp;
+  // right (or only) board
+  const fs=board(g,cxR-size/2,cy-size/2,size,m,{d,rect,dimTri:sp>0.5,sides:sp<0.5});
+  if(sp>0){
+    ctx.globalAlpha=sp;
+    board(g,W*0.25-size/2,cy-size/2,size,0,{d,rect:0,dimTri:true,sides:false});
+    ctx.globalAlpha=sp;
+    ctx.font=`700 ${fs*1.8}px Kalam,cursive`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=V('--chalk');ctx.fillText('=',W/2,cy);
+    const ty=cy+size/2+fs*1.4;ctx.font=`700 ${fs*1.15}px Kalam,cursive`;
+    ctx.fillStyle=V('--c2');ctx.fillText('c²',W*0.25,ty);
+    ctx.fillStyle=V('--a2');ctx.fillText('a²',W*0.75-fs*1.6,ty);ctx.fillStyle=V('--chalk');ctx.fillText('+',W*0.75,ty);ctx.fillStyle=V('--b2');ctx.fillText('b²',W*0.75+fs*1.6,ty);
+    ctx.font=`500 ${Math.max(11*d,fs*.6)}px "Noto Sans TC",sans-serif`;ctx.fillStyle=V('--dim');
+    ctx.fillText('空白面積',W/2,ty);
+    ctx.globalAlpha=1;
+  }
+  // UI
+  const idx=Math.min(3,Math.floor(T+0.5));
+  $('sno').textContent=`第 ${idx+1} 步 / 共 4 步`;$('stitle').textContent=STEPS[idx][0];$('sbody').textContent=STEPS[idx][1];
+  [...$('dots').children].forEach((b,i)=>b.classList.toggle('done',i<=idx));
+  document.querySelectorAll('.ln').forEach(l=>l.classList.toggle('on',idx>=+l.dataset.s));
+  $('prev').disabled=T<=0.001;$('next').disabled=T>=2.999;
+  const f=x=>Math.abs(x-Math.round(x))<1e-6?String(Math.round(x)):x.toFixed(1);
+  $('av').textContent=f(g.a);$('bv').textContent=f(g.b);
+}
+
+function tick(now){
+  const dt=Math.min(64,now-(S.last||now));S.last=now;
+  const speed=reduce?1/300:1/2200;
+  if(Math.abs(S.target-S.T)<1e-4){S.T=S.target;S.raf=0;autoOn=false;$('auto').textContent='▶ 自動播放';draw();return}
+  S.T+=Math.sign(S.target-S.T)*Math.min(Math.abs(S.target-S.T),dt*speed);
+  draw();S.raf=requestAnimationFrame(tick);
+}
+function go(t){S.target=Math.max(0,Math.min(3,t));if(!S.raf){S.last=0;S.raf=requestAnimationFrame(tick)}}
+function jump(t){cancelAnimationFrame(S.raf);S.raf=0;S.T=S.target=t;draw()}
+let autoOn=false;
+function stopAuto(){autoOn=false;$('auto').textContent='▶ 自動播放'}
+$('next').onclick=()=>{stopAuto();go(Math.floor(S.T+1e-6)+1)};
+$('prev').onclick=()=>{stopAuto();jump(Math.max(0,Math.ceil(S.T-1e-6)-1))};
+$('auto').onclick=()=>{
+  if(autoOn){stopAuto();S.target=S.T;return}
+  if(S.T>=2.999)jump(0);
+  autoOn=true;$('auto').textContent='❚❚ 暫停';go(3);
+};
+STEPS.forEach((s,i)=>{const b=document.createElement('button');b.setAttribute('aria-label',`跳到第 ${i+1} 步：${s[0]}`);b.onclick=()=>{stopAuto();jump(i)};$('dots').appendChild(b)});
+const setLegs=()=>{S.a=+$('a').value;S.b=+$('b').value;draw()};
+$('a').oninput=setLegs;$('b').oninput=setLegs;
+addEventListener('resize',resize);
+resize();
+document.fonts&&document.fonts.load('700 20px Kalam').then(()=>draw()).catch(()=>{});
+</script>
+
+</body>
+</html>

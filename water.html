@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>畢氏定理倒水實驗</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one lab bench — the rotating glass apparatus is the hero, instruments (sliders + readouts) sit beneath it */
+:root{
+  --bg:#eef2f3; --panel:#ffffff; --ink:#1d2a33; --muted:#5d6e78; --line:#c9d4d9;
+  --glass:#2c4250; --waterA:#2f86c9; --waterB:#e0913a; --accent:#1f6f9f;
+  --f-display:"Noto Serif TC","Songti TC",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10181d; --panel:#172229; --ink:#e4ecef; --muted:#93a6b0; --line:#2b3b44;
+  --glass:#b9cdd6; --waterA:#4ea3e3; --waterB:#f0a453; --accent:#6cb8ea; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10181d; --panel:#172229; --ink:#e4ecef; --muted:#93a6b0; --line:#2b3b44;
+  --glass:#b9cdd6; --waterA:#4ea3e3; --waterB:#f0a453; --accent:#6cb8ea; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 40px}
+.wrap{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:900;font-size:clamp(28px,6vw,44px);line-height:1.15;margin:0;text-wrap:balance}
+h1 .eq{font-family:var(--f-mono);font-weight:600;color:var(--accent);white-space:nowrap}
+.lede{margin:0;color:var(--muted);max-width:60ch}
+.stage{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;aspect-ratio:1/0.82;max-width:100%}
+.phase{position:absolute;left:14px;top:12px;font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
+.result{position:absolute;left:0;right:0;bottom:14px;text-align:center;font-family:var(--f-mono);font-size:clamp(16px,3.6vw,22px);font-weight:600;
+  opacity:0;transition:opacity .5s}
+.result.on{opacity:1}
+.result .A{color:var(--waterA)} .result .B{color:var(--waterB)}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px}
+@media (max-width:620px){.controls{grid-template-columns:1fr}}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:inherit;font-weight:500;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  padding:8px 16px;border-radius:999px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:700}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.field label b{font-family:var(--f-mono);color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.presets button{padding:5px 12px;font-family:var(--f-mono);font-size:13px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+td{padding:6px 0;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right;font-family:var(--f-mono)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px;vertical-align:middle}
+.note{color:var(--muted);font-size:14px;max-width:65ch;margin:0}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a href="index.html" class="backlink" style="align-self:flex-start;font-size:14px;color:inherit;opacity:.75;text-decoration:none;border:1px solid currentColor;border-radius:999px;padding:4px 14px">← 回到首頁</a>
+  <header>
+    <span class="eyebrow">Pythagorean theorem · 倒水實驗</span>
+    <h1>兩股的水，剛好裝滿斜邊 <span class="eq">a² + b² = c²</span></h1>
+    <p class="lede">每個正方形都是一個深度相同的水槽，水量就等於面積。把裝置翻轉過來，a² 和 b² 槽裡的水經過中間的三角形通道流進 c² 槽，正好一滴不剩、一格不缺。</p>
+  </header>
+
+  <div class="stage">
+    <canvas id="cv" width="880" height="720" aria-label="畢氏定理倒水動畫"></canvas>
+    <div class="phase" id="phase">準備</div>
+    <div class="result" id="result"></div>
+  </div>
+
+  <div class="controls">
+    <div class="field" style="gap:12px">
+      <div class="row">
+        <button class="primary" id="play">▶ 播放</button>
+        <button id="reset">重來</button>
+      </div>
+      <div class="field">
+        <label for="t">時間軸 <b id="tv">0%</b></label>
+        <input type="range" id="t" min="0" max="1000" value="0">
+      </div>
+      <div class="field">
+        <label for="a">股 a <b id="av">3</b></label>
+        <input type="range" id="a" min="1" max="12" step="0.5" value="3">
+      </div>
+      <div class="field">
+        <label for="b">股 b <b id="bv">4</b></label>
+        <input type="range" id="b" min="1" max="12" step="0.5" value="4">
+      </div>
+      <div class="row presets">
+        <span class="note" style="font-size:13px">常見組合</span>
+        <button data-a="3" data-b="4">3‑4‑5</button>
+        <button data-a="5" data-b="12">5‑12‑13</button>
+        <button data-a="6" data-b="8">6‑8‑10</button>
+        <button data-a="5" data-b="5">等腰</button>
+      </div>
+    </div>
+    <div class="field">
+      <table>
+        <tr><td><span class="sw" style="background:var(--waterA)"></span>a² 槽剩餘水量</td><td id="ra">9.00</td></tr>
+        <tr><td><span class="sw" style="background:var(--waterB)"></span>b² 槽剩餘水量</td><td id="rb">16.00</td></tr>
+        <tr><td>c² 槽目前水量</td><td id="rc">0.00</td></tr>
+        <tr><td>c² 槽容量 (c = <span id="cval">5</span>)</td><td id="cap">25.00</td></tr>
+      </table>
+      <p class="note" style="margin-top:12px">先倒藍色的 a²，再倒橘色的 b²。注意 c² 槽裡兩種顏色的分界：藍色佔了 a² 的面積，橘色補上剩下的 b²，合起來剛好是 c²。換成任何直角三角形結果都一樣。</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+const S={a:3,b:4,T:0,playing:false,last:0};
+const DUR=10000;
+const clamp=x=>Math.max(0,Math.min(1,x));
+const ease=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function resize(){
+  const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);
+  cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);draw();
+}
+function geom(){
+  const a=S.a,b=S.b,c=Math.hypot(a,b);
+  const P0=[0,0],P1=[a,0],P2=[0,b];
+  return{a,b,c,
+    tri:[P0,P1,P2],
+    A:[P0,P1,[a,-a],[0,-a]],
+    B:[P0,[-b,0],[-b,b],P2],
+    C:[P1,[a+b,a],[b,a+b],P2],
+    sideA:[P0,P1],sideB:[P0,P2],hyp:[P1,P2]};
+}
+function area(p){let s=0;for(let i=0;i<p.length;i++){const q=p[i],r=p[(i+1)%p.length];s+=q[0]*r[1]-r[0]*q[1]}return Math.abs(s)/2}
+// keep part of polygon with screen y >= h (below water line)
+function clipBelow(p,h){
+  const out=[];
+  for(let i=0;i<p.length;i++){
+    const P=p[i],Q=p[(i+1)%p.length],pin=P[1]>=h,qin=Q[1]>=h;
+    if(pin)out.push(P);
+    if(pin!==qin){const t=(h-P[1])/(Q[1]-P[1]);out.push([P[0]+t*(Q[0]-P[0]),h])}
+  }
+  return out;
+}
+function waterPoly(p,frac){
+  if(frac<=0.0005)return null;
+  if(frac>=0.9995)return p;
+  const V=area(p)*frac;let lo=Math.min(...p.map(q=>q[1])),hi=Math.max(...p.map(q=>q[1]));
+  for(let i=0;i<40;i++){const m=(lo+hi)/2;if(area(clipBelow(p,m))>V)lo=m;else hi=m}
+  return clipBelow(p,(lo+hi)/2);
+}
+function state(){
+  const T=S.T;
+  return{rot:ease(clamp(T/0.26)),pa:ease(clamp((T-0.32)/0.3)),pb:ease(clamp((T-0.66)/0.3))};
+}
+function path(p){ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath()}
+function centroid(p){let x=0,y=0;p.forEach(q=>{x+=q[0];y+=q[1]});return[x/p.length,y/p.length]}
+
+function draw(now=performance.now()){
+  const css=getComputedStyle(document.documentElement),V=n=>css.getPropertyValue(n).trim();
+  const W=cv.width,H=cv.height,d=W/cv.getBoundingClientRect().width||1;
+  const g=geom(),st=state();
+  ctx.clearRect(0,0,W,H);
+  // rotation: start with hypotenuse square pointing up, end flipped
+  const th0=Math.PI/2-Math.atan2(g.a,g.b),th=th0+Math.PI*st.rot;
+  const all=[...g.A,...g.B,...g.C];
+  const xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);
+  const G=[(Math.min(...xs)+Math.max(...xs))/2,(Math.min(...ys)+Math.max(...ys))/2];
+  const R=Math.max(...all.map(p=>Math.hypot(p[0]-G[0],p[1]-G[1])));
+  const sc=Math.min(W,H*0.9)/2/(R*1.06),cx=W/2,cy=H*0.47;
+  const co=Math.cos(th),si=Math.sin(th);
+  const T=p=>{const x=p[0]-G[0],y=p[1]-G[1];return[cx+sc*(x*co-y*si),cy-sc*(x*si+y*co)]};
+  const tp=poly=>poly.map(T);
+  const sA=tp(g.A),sB=tp(g.B),sC=tp(g.C),sT=tp(g.tri);
+  const wA=V('--waterA'),wB=V('--waterB'),glass=V('--glass'),ink=V('--ink'),muted=V('--muted');
+
+  // glass tint
+  ctx.globalAlpha=0.06;ctx.fillStyle=glass;[sA,sB,sC,sT].forEach(p=>{path(p);ctx.fill()});ctx.globalAlpha=1;
+
+  // water in leg squares
+  const fa=1-st.pa,fb=1-st.pb;
+  let w=waterPoly(sA,fa);if(w){ctx.fillStyle=wA;path(w);ctx.fill()}
+  w=waterPoly(sB,fb);if(w){ctx.fillStyle=wB;path(w);ctx.fill()}
+  // water in hypotenuse square: total level in B color, a-part below in A color
+  const c2=g.c*g.c,volA=st.pa*g.a*g.a,volB=st.pb*g.b*g.b;
+  w=waterPoly(sC,(volA+volB)/c2);if(w){ctx.fillStyle=wB;path(w);ctx.fill()}
+  w=waterPoly(sC,volA/c2);if(w){ctx.fillStyle=wA;path(w);ctx.fill()}
+
+  // flow through triangle channel
+  const flowing=[[st.pa,g.sideA,wA],[st.pb,g.sideB,wB]].find(f=>f[0]>0.002&&f[0]<0.998);
+  if(flowing){
+    const [,side,col]=flowing;
+    ctx.save();path(sT);ctx.clip();
+    ctx.globalAlpha=0.22;ctx.fillStyle=col;path(sT);ctx.fill();ctx.globalAlpha=1;
+    const s0=side.map(T),h0=tp(g.hyp);ctx.fillStyle=col;
+    const tt=reduce?0:now/900;
+    for(let i=0;i<46;i++){
+      const u=(i*0.6180339)%1,v=(i*0.4142+0.13)%1,f=(tt+i*0.137)%1;
+      const A=[s0[0][0]+(s0[1][0]-s0[0][0])*u,s0[0][1]+(s0[1][1]-s0[0][1])*u];
+      const B=[h0[0][0]+(h0[1][0]-h0[0][0])*v,h0[0][1]+(h0[1][1]-h0[0][1])*v];
+      const x=A[0]+(B[0]-A[0])*f,y=A[1]+(B[1]-A[1])*f;
+      ctx.beginPath();ctx.arc(x,y,Math.max(2,sc*0.07)*(0.6+0.4*Math.sin(i)),0,7);ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // glass walls
+  ctx.lineJoin='round';ctx.strokeStyle=glass;ctx.lineWidth=Math.max(2.5,3*d);
+  [sA,sB,sC].forEach(p=>{path(p);ctx.stroke()});
+  ctx.setLineDash([6*d,5*d]);ctx.lineWidth=1.5*d;path(sT);ctx.stroke();ctx.setLineDash([]);
+  // right-angle mark
+  const r0=T([0,0]),rq=Math.min(g.a,g.b)*0.18;
+  ctx.beginPath();[[rq,0],[rq,rq],[0,rq]].map(T).forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.lineWidth=1.5*d;ctx.stroke();
+
+  // labels
+  const fs=Math.max(13,Math.min(26,sc*0.55))*1;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  const lab=(p,t,sub,col)=>{const[c0,c1]=centroid(p);
+    ctx.fillStyle=col;ctx.font=`700 ${fs}px "IBM Plex Mono",monospace`;
+    ctx.lineWidth=4*d;ctx.strokeStyle=V('--panel');ctx.strokeText(t,c0,c1-fs*0.35);ctx.fillText(t,c0,c1-fs*0.35);
+    ctx.font=`500 ${fs*0.62}px "IBM Plex Mono",monospace`;ctx.strokeText(sub,c0,c1+fs*0.55);ctx.fillText(sub,c0,c1+fs*0.55)};
+  lab(sA,'a²',(g.a*g.a).toFixed(1),ink);
+  lab(sB,'b²',(g.b*g.b).toFixed(1),ink);
+  lab(sC,'c²',c2.toFixed(1),ink);
+  const tc=centroid(g.tri);
+  const sideLab=(seg,t)=>{const m=[(seg[0][0]+seg[1][0])/2,(seg[0][1]+seg[1][1])/2];
+    const k=0.32,pt=T([m[0]+(tc[0]-m[0])*k,m[1]+(tc[1]-m[1])*k]);
+    ctx.font=`italic 600 ${fs*0.7}px "Noto Serif TC",serif`;ctx.fillStyle=muted;ctx.fillText(t,pt[0],pt[1])};
+  sideLab(g.sideA,'a');sideLab(g.sideB,'b');sideLab(g.hyp,'c');
+
+  // readouts
+  $('ra').textContent=(fa*g.a*g.a).toFixed(2);
+  $('rb').textContent=(fb*g.b*g.b).toFixed(2);
+  $('rc').textContent=(volA+volB).toFixed(2);
+  $('cap').textContent=c2.toFixed(2);
+  $('cval').textContent=g.c.toFixed(2).replace(/\.00$/,'');
+  $('phase').textContent=S.T<0.005?'準備：a²、b² 槽裝滿水':st.rot<1?'翻轉裝置…':st.pa<1?'倒入 a² 的水':st.pb<1?'倒入 b² 的水':'完成：c² 剛好裝滿';
+  const done=S.T>=0.97;
+  const r=$('result');r.classList.toggle('on',done);
+  r.innerHTML=`<span class="A">${fmt(g.a*g.a)}</span> + <span class="B">${fmt(g.b*g.b)}</span> = ${fmt(c2)}`;
+  $('tv').textContent=Math.round(S.T*100)+'%';
+}
+const fmt=x=>Math.abs(x-Math.round(x))<1e-6?String(Math.round(x)):x.toFixed(2);
+
+function loop(now){
+  if(!S.playing)return;
+  const dt=now-(S.last||now);S.last=now;
+  S.T=Math.min(1,S.T+dt/DUR);$('t').value=Math.round(S.T*1000);
+  if(S.T>=1)setPlaying(false);
+  draw(now);
+  if(S.playing)requestAnimationFrame(loop);
+}
+function setPlaying(p){
+  S.playing=p;$('play').textContent=p?'❚❚ 暫停':'▶ 播放';
+  if(p){if(S.T>=1)S.T=0;S.last=0;requestAnimationFrame(loop)}
+}
+$('play').onclick=()=>setPlaying(!S.playing);
+$('reset').onclick=()=>{setPlaying(false);S.T=0;$('t').value=0;draw()};
+$('t').oninput=e=>{setPlaying(false);S.T=e.target.value/1000;draw()};
+const setLegs=(a,b)=>{S.a=+a;S.b=+b;$('a').value=a;$('b').value=b;$('av').textContent=a;$('bv').textContent=b;draw()};
+$('a').oninput=e=>setLegs(e.target.value,S.b);
+$('b').oninput=e=>setLegs(S.a,e.target.value);
+document.querySelectorAll('.presets button').forEach(bt=>bt.onclick=()=>setLegs(bt.dataset.a,bt.dataset.b));
+// idle redraw for flowing particles while paused mid-pour
+setInterval(()=>{if(!S.playing&&S.T>0.3&&S.T<0.97&&!reduce)draw()},60);
+addEventListener('resize',resize);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>draw());
+new MutationObserver(()=>draw()).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+resize();
+document.fonts&&document.fonts.ready.then(()=>draw());
+</script>
+
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>青朱出入圖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a scholar's worksheet — the dissection figure on the left like a woodblock plate, the step commentary (注) beside it; stacks on phones */
+:root{
+  --bg:#eceef0; --paper:#f8f8f7; --ink:#22262b; --muted:#646b73; --line:#cfd4d8;
+  --zhu:#c8452c; --qing:#2e7d86; --accent:#8a3a28;
+  --f-display:"LXGW WenKai TC","Kaiti TC","STKaiti","KaiTi",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14171a; --paper:#1c2024; --ink:#e6e8ea; --muted:#99a1a9; --line:#2f353b;
+  --zhu:#e86a4f; --qing:#4fb0ba; --accent:#f09a7c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171a; --paper:#1c2024; --ink:#e6e8ea; --muted:#99a1a9; --line:#2f353b;
+  --zhu:#e86a4f; --qing:#4fb0ba; --accent:#f09a7c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 40px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:13px;letter-spacing:.14em;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,6.5vw,48px);line-height:1.15;margin:0;text-wrap:balance}
+h1 .z{color:var(--zhu)} h1 .q{color:var(--qing)}
+.lede{margin:0;color:var(--muted);max-width:62ch}
+.main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:760px){.main{grid-template-columns:1fr}}
+.plate{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:6px}
+canvas{display:block;width:100%;height:auto;aspect-ratio:1/1;max-width:100%}
+.eqn{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-family:var(--f-display);font-size:clamp(18px,4vw,26px);
+  opacity:0;transition:opacity .5s}
+.eqn.on{opacity:1}
+.eqn .z{color:var(--zhu)} .eqn .q{color:var(--qing)}
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.steps{display:flex;gap:6px}
+.steps button{flex:1;height:6px;padding:0;border:0;border-radius:3px;background:var(--line);cursor:pointer}
+.steps button.done{background:var(--accent)}
+.step-no{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.08em}
+.step-title{font-family:var(--f-display);font-size:26px;font-weight:700;margin:2px 0 6px;line-height:1.3}
+.step-body{margin:0;min-height:5.2em}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button.b{font:inherit;font-weight:500;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--paper);font-weight:700}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.field label b{font-family:var(--f-mono);color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+td{padding:5px 0;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right;font-family:var(--f-mono)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px;vertical-align:middle}
+blockquote{margin:0;padding:14px 16px;border-left:3px solid var(--accent);background:var(--paper);font-family:var(--f-display);font-size:17px;line-height:1.8}
+blockquote cite{display:block;margin-top:6px;font-family:var(--f-body);font-style:normal;font-size:13px;color:var(--muted)}
+.note{color:var(--muted);font-size:14px;max-width:68ch;margin:0}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a href="index.html" class="backlink" style="align-self:flex-start;font-size:14px;color:inherit;opacity:.75;text-decoration:none;border:1px solid currentColor;border-radius:999px;padding:4px 14px">← 回到首頁</a>
+  <header>
+    <span class="eyebrow">劉徽注《九章算術》· 出入相補</span>
+    <h1><span class="z">朱方</span>＋<span class="q">青方</span>＝弦方</h1>
+    <p class="lede">勾自乘為朱方，股自乘為青方。把兩方中跑到弦方外面的部分剪下來，移進弦方裡空缺的地方，不增不減，兩方就合成一個弦方。</p>
+  </header>
+
+  <div class="main">
+    <div class="plate">
+      <canvas id="cv" width="800" height="800" aria-label="青朱出入圖動畫"></canvas>
+      <div class="eqn" id="eqn"></div>
+    </div>
+
+    <div class="side">
+      <div class="steps" id="dots"></div>
+      <div>
+        <div class="step-no" id="sno">第 1 步 / 共 6 步</div>
+        <div class="step-title" id="stitle"></div>
+        <p class="step-body" id="sbody"></p>
+      </div>
+      <div class="row">
+        <button class="b" id="prev">上一步</button>
+        <button class="b primary" id="next">下一步</button>
+        <button class="b" id="auto">▶ 自動播放</button>
+      </div>
+      <div class="field">
+        <label for="a">勾（短邊）a <b id="av">3</b></label>
+        <input type="range" id="a" min="1" max="10" step="0.5" value="3">
+      </div>
+      <div class="field">
+        <label for="b">股（長邊）b <b id="bv">4</b></label>
+        <input type="range" id="b" min="1" max="10" step="0.5" value="4">
+      </div>
+      <table>
+        <tr><td><span class="sw" style="background:var(--zhu)"></span>朱方 勾² = a²</td><td id="ra">9</td></tr>
+        <tr><td><span class="sw" style="background:var(--qing)"></span>青方 股² = b²</td><td id="rb">16</td></tr>
+        <tr><td>弦方 弦² = c²（c = <span id="cv2">5</span>）</td><td id="rc">25</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <blockquote>勾自乘為朱方，股自乘為青方，令出入相補，各從其類，因就其餘不移動也，合成弦方之冪。
+    <cite>劉徽《九章算術注》勾股章（263 年）</cite></blockquote>
+  <p class="note">劉徽原本的圖已經失傳，只留下這段文字。這裡用的是常見的復原方式：朱方、青方並排，在勾股形的弦上作弦方，再把「出」的兩塊轉進「入」的兩處。圖中的格子每格代表 1 單位面積，可以直接數。</p>
+</div>
+
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),$=id=>document.getElementById(id);
+const S={a:3,b:4,T:0,target:0,last:0,raf:0};
+const STEPS=[
+  ['勾股形','取一個直角三角形，短的直角邊叫「勾」a，長的叫「股」b，斜邊叫「弦」c。勾自乘作朱方 a²，股自乘作青方 b²，兩方並排放好。'],
+  ['作弦方','在弦 c 上作一個正方形，這就是弦方 c²。它一部分蓋住朱方和青方，一部分懸在外面。'],
+  ['找出「出」與「入」','朱、青兩方落在弦方外面的兩塊三角形叫「出」（多出來的）；弦方裡面還空著的兩塊叫「入」（要補進去的）。每一對的形狀大小完全相同。'],
+  ['第一次出入相補','左下這塊青色的「出」，以弦方左邊的頂點為軸轉 90°，正好落進左上角的「入」。'],
+  ['第二次出入相補','右下這塊「出」（含朱、青兩色），以弦方右邊的頂點為軸轉 90°，補進右上角的「入」。其餘的部分「因就其餘不移動」。'],
+  ['合成弦方之冪','弦方被填滿了，用的全部是原來朱方和青方的面積，不多也不少。所以 勾² ＋ 股² ＝ 弦²。']
+];
+const clamp=x=>Math.max(0,Math.min(1,x));
+const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---- geometry (math coords, y up). 股方 left [0,b]², 勾方 right [b,a+b]×[0,a]
+function sarea(p){let s=0;for(let i=0;i<p.length;i++){const q=p[i],r=p[(i+1)%p.length];s+=q[0]*r[1]-r[0]*q[1]}return s/2}
+function clipConvex(subj,clip){
+  let out=subj;const o=sarea(clip)>0?1:-1;
+  for(let i=0;i<clip.length&&out.length;i++){
+    const A=clip[i],B=clip[(i+1)%clip.length],inp=[...out];out=[];
+    const side=p=>o*((B[0]-A[0])*(p[1]-A[1])-(B[1]-A[1])*(p[0]-A[0]));
+    for(let j=0;j<inp.length;j++){
+      const P=inp[j],Q=inp[(j+1)%inp.length],sp=side(P),sq=side(Q);
+      if(sp>=-1e-9)out.push(P);
+      if((sp>=-1e-9)!==(sq>=-1e-9)){const t=sp/(sp-sq);out.push([P[0]+t*(Q[0]-P[0]),P[1]+t*(Q[1]-P[1])])}
+    }
+  }
+  return out.length>=3&&Math.abs(sarea(out))>1e-7?out:null;
+}
+const rect=(x0,y0,x1,y1)=>[[x0,y0],[x1,y0],[x1,y1],[x0,y1]];
+function geom(){
+  const a=Math.min(S.a,S.b),b=Math.max(S.a,S.b),c=Math.hypot(a,b);
+  const qing=rect(0,0,b,b),zhu=rect(b,0,a+b,a);
+  const P=[a,0],Sv=[a+b,a],R=[b,a+b],Q=[0,b];
+  const sq=[P,Sv,R,Q];
+  const T1=[[0,0],P,Q], T2=[P,[a+b,0],Sv];
+  return{a,b,c,qing,zhu,sq,P,Q,R,Sv,
+    pieces:[
+      {poly:T1,pivot:Q,ang:Math.PI/2,parts:[[clipConvex(T1,qing),'--qing'],[clipConvex(T1,zhu),'--zhu']]},
+      {poly:T2,pivot:Sv,ang:-Math.PI/2,parts:[[clipConvex(T2,qing),'--qing'],[clipConvex(T2,zhu),'--zhu']]}],
+    gaps:[[Q,[b,b],R],[[b,a],Sv,R]],
+    stay:[[clipConvex(qing,sq),'--qing'],[clipConvex(zhu,sq),'--zhu']]};
+}
+const rot=(p,c,t)=>{const x=p[0]-c[0],y=p[1]-c[1],co=Math.cos(t),si=Math.sin(t);return[c[0]+x*co-y*si,c[1]+x*si+y*co]};
+
+function resize(){const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);draw()}
+
+function draw(){
+  const css=getComputedStyle(document.documentElement),V=n=>css.getPropertyValue(n).trim();
+  const W=cv.width,H=cv.height,d=W/(cv.getBoundingClientRect().width||W);
+  const g=geom(),T=S.T,N=g.a+g.b;
+  const sc=Math.min(W,H)/(N*1.22),ox=(W-sc*N)/2,oy=H-(H-sc*N)/2+sc*N*0.02;
+  const X=p=>[ox+sc*p[0],oy-sc*p[1]];
+  const path=(poly)=>{ctx.beginPath();poly.map(X).forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath()};
+  const ink=V('--ink'),muted=V('--muted'),line=V('--line'),paper=V('--paper'),acc=V('--accent');
+  const outline=clamp(T-1),mark=clamp(T-2),r1=ease(clamp(T-3)),r2=ease(clamp(T-4)),fin=T>=4.999;
+  ctx.clearRect(0,0,W,H);
+
+  // unit grid over the whole board
+  ctx.strokeStyle=line;ctx.lineWidth=1*d;ctx.globalAlpha=.7;
+  for(let i=0;i<=Math.floor(N);i++){let p=X([i,0]),q=X([i,N]);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();
+    p=X([0,i]);q=X([N,i]);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke()}
+  ctx.globalAlpha=1;
+
+  const fillA=.78;
+  // stationary parts
+  g.stay.forEach(([p,c])=>{if(!p)return;ctx.globalAlpha=fillA;ctx.fillStyle=V(c);path(p);ctx.fill();ctx.globalAlpha=1});
+  // gaps (入)
+  if(mark>0){
+    g.gaps.forEach((gp,i)=>{
+      const filled=i===0?r1:r2;
+      ctx.save();path(gp);ctx.clip();
+      ctx.globalAlpha=mark*(1-filled)*.9;ctx.strokeStyle=acc;ctx.lineWidth=1.2*d;
+      const bb=gp.map(X),mx=Math.min(...bb.map(q=>q[0])),Mx=Math.max(...bb.map(q=>q[0])),my=Math.min(...bb.map(q=>q[1])),My=Math.max(...bb.map(q=>q[1]));
+      for(let x=mx-(My-my);x<Mx;x+=7*d){ctx.beginPath();ctx.moveTo(x,My);ctx.lineTo(x+(My-my),my);ctx.stroke()}
+      ctx.restore();ctx.globalAlpha=1;
+    });
+  }
+  // moving pieces
+  const prog=[r1,r2];
+  g.pieces.forEach((pc,i)=>{
+    const t=pc.ang*prog[i],m=p=>rot(p,pc.pivot,t);
+    pc.parts.forEach(([p,c])=>{if(!p)return;ctx.globalAlpha=fillA;ctx.fillStyle=V(c);path(p.map(m));ctx.fill();ctx.globalAlpha=1});
+    if(mark>0){ctx.strokeStyle=acc;ctx.lineWidth=2.4*d;ctx.globalAlpha=mark*(fin?0.35:1);path(pc.poly.map(m));ctx.stroke();ctx.globalAlpha=1}
+  });
+  // square outlines of 朱方 / 青方 (original positions, faint after moving)
+  ctx.strokeStyle=ink;ctx.lineWidth=1.6*d;ctx.globalAlpha=T>=3?.25:.9;
+  path(g.qing);ctx.stroke();path(g.zhu);ctx.stroke();ctx.globalAlpha=1;
+  // 弦方 outline, drawn progressively
+  if(outline>0){
+    const pts=[...g.sq,g.sq[0]].map(X);ctx.strokeStyle=ink;ctx.lineWidth=3*d;ctx.lineJoin='round';
+    ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);let left=outline*4;
+    for(let i=1;i<pts.length&&left>0;i++){const f=Math.min(1,left);ctx.lineTo(pts[i-1][0]+(pts[i][0]-pts[i-1][0])*f,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*f);left-=1}
+    ctx.stroke();
+  }
+  // pivots
+  if(T>2.6&&!fin){[[g.Q,r1<1&&T<4],[g.Sv,T>=3.95&&r2<1]].forEach(([p,on])=>{if(!on)return;const q=X(p);ctx.fillStyle=acc;ctx.beginPath();ctx.arc(q[0],q[1],5*d,0,7);ctx.fill()})}
+
+  // text helpers
+  const fsz=Math.max(12*d,Math.min(26*d,sc*0.42));
+  const txt=(s,p,size,col,weight='700',halo=true)=>{const q=X(p);ctx.font=`${weight} ${size}px "LXGW WenKai TC","Kaiti TC",serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';if(halo){ctx.lineWidth=4*d;ctx.strokeStyle=paper;ctx.strokeText(s,q[0],q[1])}ctx.fillStyle=col;ctx.fillText(s,q[0],q[1])};
+  const cen=p=>[p.reduce((s,q)=>s+q[0],0)/p.length,p.reduce((s,q)=>s+q[1],0)/p.length];
+
+  // square names
+  if(T<3){txt('青方',[g.b/2,g.b*0.68],fsz*1.05,ink);txt('朱方',[g.b+g.a/2,g.a*0.72],fsz*(g.a<2?0.75:1.05),ink)}
+  if(outline>0.9){const c0=cen(g.sq);txt('弦方',[c0[0],c0[1]+ (fin?0:0)],fsz*1.1,ink);ctx.globalAlpha=1}
+  // triangle sides on the moving piece 1
+  {const m=p=>rot(p,g.pieces[0].pivot,g.pieces[0].ang*r1);const O=m([0,0]),Pp=m(g.P),Qq=m(g.Q),tc=cen([O,Pp,Qq]);
+    const lbl=(A,B,s)=>{const mid=[(A[0]+B[0])/2,(A[1]+B[1])/2];txt(s,[mid[0]+(tc[0]-mid[0])*0.34,mid[1]+(tc[1]-mid[1])*0.34],fsz*0.78,ink)};
+    if(!fin&&T<3.05){lbl(O,Pp,'勾 a');lbl(O,Qq,'股 b');lbl(Pp,Qq,'弦 c')}}
+  // 出 / 入 labels
+  if(mark>0&&!fin){
+    ctx.globalAlpha=mark;
+    g.pieces.forEach((pc,i)=>{if(prog[i]>0.02)return;txt('出',cen(pc.poly),fsz*0.95,acc)});
+    g.gaps.forEach((gp,i)=>{if(prog[i]>0.02)return;txt('入',cen(gp),fsz*0.95,acc)});
+    ctx.globalAlpha=1;
+  }
+
+  // UI sync
+  const idx=Math.min(5,Math.floor(T+1e-6));
+  $('sno').textContent=`第 ${idx+1} 步 / 共 6 步`;$('stitle').textContent=STEPS[idx][0];$('sbody').textContent=STEPS[idx][1];
+  [...$('dots').children].forEach((b,i)=>b.classList.toggle('done',i<=idx));
+  $('prev').disabled=T<=0.001;$('next').disabled=T>=4.999;
+  const f=x=>Math.abs(x-Math.round(x))<1e-6?String(Math.round(x)):x.toFixed(2);
+  $('ra').textContent=f(g.a*g.a);$('rb').textContent=f(g.b*g.b);$('rc').textContent=f(g.c*g.c);$('cv2').textContent=f(g.c);
+  const e=$('eqn');e.classList.toggle('on',fin);
+  e.innerHTML=`<span class="z">${f(g.a*g.a)}</span> ＋ <span class="q">${f(g.b*g.b)}</span> ＝ ${f(g.c*g.c)}`;
+}
+
+function tick(now){
+  const dt=Math.min(64,now-(S.last||now));S.last=now;
+  const speed=reduce?1/400:1/1800;
+  if(Math.abs(S.target-S.T)<1e-4){S.T=S.target;S.raf=0;setAuto(false,true);draw();return}
+  S.T+=Math.sign(S.target-S.T)*Math.min(Math.abs(S.target-S.T),dt*speed);
+  draw();S.raf=requestAnimationFrame(tick);
+}
+function go(target){S.target=Math.max(0,Math.min(5,target));if(!S.raf){S.last=0;S.raf=requestAnimationFrame(tick)}}
+let autoOn=false;
+function setAuto(on,fromEnd){autoOn=on&&!fromEnd;$('auto').textContent=autoOn?'❚❚ 暫停':'▶ 自動播放'}
+$('next').onclick=()=>{setAuto(false);go(Math.floor(S.T+1e-6)+1)};
+$('prev').onclick=()=>{setAuto(false);cancelAnimationFrame(S.raf);S.raf=0;S.T=S.target=Math.max(0,Math.ceil(S.T-1e-6)-1);draw()};
+$('auto').onclick=()=>{
+  if(autoOn){setAuto(false);S.target=S.T;return}
+  if(S.T>=4.999){S.T=0;S.target=0}
+  setAuto(true);go(5);
+};
+const dots=$('dots');STEPS.forEach((s,i)=>{const b=document.createElement('button');b.setAttribute('aria-label',`跳到第 ${i+1} 步：${s[0]}`);
+  b.onclick=()=>{setAuto(false);cancelAnimationFrame(S.raf);S.raf=0;S.T=S.target=i;draw()};dots.appendChild(b)});
+const setLegs=()=>{S.a=+$('a').value;S.b=+$('b').value;$('av').textContent=Math.min(S.a,S.b);$('bv').textContent=Math.max(S.a,S.b);draw()};
+$('a').oninput=setLegs;$('b').oninput=setLegs;
+addEventListener('resize',resize);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>draw());
+new MutationObserver(()=>draw()).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+resize();
+document.fonts&&document.fonts.load('700 20px "LXGW WenKai TC"','勾股弦朱青方出入').then(()=>draw()).catch(()=>{});
+</script>
+
+</body>
+</html>
